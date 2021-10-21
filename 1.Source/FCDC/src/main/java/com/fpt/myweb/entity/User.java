@@ -1,6 +1,7 @@
 package com.fpt.myweb.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,27 +18,39 @@ import java.util.List;
 @Setter
 public class User extends BaseEntity {
 
+    @JsonProperty
     @Column(name = "username")
     private String username;
 
+    @JsonProperty
     @Column(name = "password")
     private String password;
 
+    @JsonProperty
     @Column(name = "firstname")
     private String firstname;
 
+    @JsonProperty
     @Column(name = "lastname")
     private String lastname;
 
+    @JsonProperty
     @Column(name = "email")
     private String email;
 
+    @JsonProperty
     @Column(name = "phone")
     private String phone;
 
+    @JsonProperty
     @Column(name = "address")
     private String address;
 
+    @JsonProperty
+    @Column(name = "imageUrl")
+    private String imageUrl;
+
+    @JsonProperty
     @Column(name = "birthOfdate")
     private Date birthOfdate;
 

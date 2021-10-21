@@ -33,8 +33,7 @@ public class LoginController {
         }else{
             LoginResponse loginResponse = new LoginResponse();
             loginResponse.setUsername(user.getUsername());
-            loginResponse.setPassword(user.getPassword());
-            loginResponse.setRole_id(user.getRoles().getId());
+            loginResponse.setRole(user.getRoles().getName());
             commonRes.setData(loginResponse);
         }
         return ResponseEntity.ok(commonRes);

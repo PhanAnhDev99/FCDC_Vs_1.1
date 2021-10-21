@@ -1,21 +1,19 @@
 package com.fpt.myweb.dto.request;
 
-import com.fpt.myweb.entity.Role;
-import com.fpt.myweb.entity.Village;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.util.Date;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
 public class UserRequet {
+
+    private Long id;
 
     private String username;
 
@@ -37,6 +35,7 @@ public class UserRequet {
 
     private String address;
 
+    private String imageUrl;
 
     private Date birthOfdate;
 

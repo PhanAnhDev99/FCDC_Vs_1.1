@@ -3,17 +3,20 @@ package com.fpt.myweb.service.impl;
 
 
 
+import com.fpt.myweb.common.Contants;
 import com.fpt.myweb.convert.UserConvert;
 import com.fpt.myweb.dto.request.UserRequet;
 import com.fpt.myweb.entity.Role;
 import com.fpt.myweb.entity.User;
 import com.fpt.myweb.entity.Village;
-import com.fpt.myweb.exception.Dup;
+import com.fpt.myweb.exception.AppException;
+import com.fpt.myweb.exception.ErrorCode;
 import com.fpt.myweb.repository.RoleRepository;
 import com.fpt.myweb.repository.UserRepository;
 import com.fpt.myweb.repository.VillageRepository;
 import com.fpt.myweb.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,6 +36,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserConvert userConvert;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public List<UserRequet> getAllUser() {
         List<User> userList = userRepository.findAll();
@@ -45,55 +51,77 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserRequet getUser(long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new Dup("Not found ID = " + id));
+        User user = userRepository.findById(id).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_ID.getKey(), ErrorCode.NOT_FOUND_ID.getValue() + id));
         UserRequet userRequet = userConvert.convertToUserRequest(user);
         return userRequet;
     }
 
     @Override
-    public UserRequet addUser(UserRequet userRequet) {
-        Role role = roleRepository.findById(userRequet.getRole_id()).orElseThrow(() -> new Dup("Not found role ID = " + userRequet.getRole_id()));
-        Village village = villageRepository.findById(userRequet.getVillage_id()).orElseThrow(() -> new Dup("Not village ID = " + userRequet.getVillage_id()));
+    public User addUser(UserRequet userRequet) {
+        Role role = roleRepository.findById(userRequet.getRole_id()).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + userRequet.getRole_id()));
+        Village village = villageRepository.findById(userRequet.getVillage_id()).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_VILLAGE_ID.getKey(), ErrorCode.NOT_FOUND_VILLAGE_ID.getValue() + userRequet.getVillage_id()));
         User user = userConvert.convertToUser(userRequet);
         user.setRoles(role);
         user.setVillage(village);
+        user.setUsername(userRequet.getUsername());
+        user.setPassword(passwordEncoder.encode(userRequet.getPassword()));
+        user.setAddress(userRequet.getAddress());
+        user.setEmail(userRequet.getEmail());
+        user.setBirthOfdate(userRequet.getBirthOfdate());
+        user.setFirstname(userRequet.getFirstname());
+        user.setLastname(userRequet.getLastname());
+        user.setPhone(userRequet.getPhone());
+        user.setImageUrl(userRequet.getImageUrl());
         user.setCreatedDate(new Date());
         User user1 = userRepository.save(user);
-        UserRequet userRequet1 = userConvert.convertToUserRequest(user);
-        return userRequet1;
+        return user1;
     }
 
     @Override
     public UserRequet deleteUser(long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new Dup("Not found ID = " + id));
+        User user = userRepository.findById(id).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_ID.getKey(), ErrorCode.NOT_FOUND_ID.getValue() + id));
         UserRequet userRequet = userConvert.convertToUserRequest(user);
         userRepository.delete(user);
         return userRequet;
     }
 
     @Override
-    public UserRequet edit(long id, UserRequet userRequet) {
-        User user1 = userRepository.findById(id).orElseThrow(() -> new Dup("Not found ID = " + id));
-        Role role = roleRepository.findById(userRequet.getRole_id()).orElseThrow(() -> new Dup("Not found role ID = " + userRequet.getRole_id()));
-        Village village = villageRepository.findById(userRequet.getVillage_id()).orElseThrow(() -> new Dup("Not village ID = " + userRequet.getVillage_id()));
-        user1.setUsername(userRequet.getUsername());
-        user1.setPassword(userRequet.getPassword());
-        user1.setFirstname(userRequet.getFirstname());
-        user1.setLastname(userRequet.getLastname());
-        user1.setPhone(userRequet.getPhone());
-        user1.setAddress(userRequet.getAddress());
-        user1.setBirthOfdate(userRequet.getBirthOfdate());
-        user1.setEmail(userRequet.getEmail());
-        user1.setRoles(role);
-        user1.setVillage(village);
-        UserRequet userRequet1 = userConvert.convertToUserRequest(userRepository.save(user1));
+    public UserRequet edit(UserRequet userRequet) {
+        User user = userRepository.findById(userRequet.getId()).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_ID.getKey(), ErrorCode.NOT_FOUND_ID.getValue() + userRequet.getId()));
+        Role role = roleRepository.findById(userRequet.getRole_id()).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + userRequet.getRole_id()));
+        Village village = villageRepository.findById(userRequet.getVillage_id()).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_VILLAGE_ID.getKey(), ErrorCode.NOT_FOUND_VILLAGE_ID.getValue() + userRequet.getVillage_id()));
+        user.setRoles(role);
+        user.setVillage(village);
+        user.setUsername(userRequet.getUsername());
+        user.setPassword(passwordEncoder.encode(userRequet.getPassword()));
+        user.setAddress(userRequet.getAddress());
+        user.setEmail(userRequet.getEmail());
+        user.setBirthOfdate(userRequet.getBirthOfdate());
+        user.setFirstname(userRequet.getFirstname());
+        user.setLastname(userRequet.getLastname());
+        user.setPhone(userRequet.getPhone());
+        user.setImageUrl(userRequet.getImageUrl());
+        user.setModifiedDate(new Date());
+        UserRequet userRequet1 = userConvert.convertToUserRequest(userRepository.save(user));
         return userRequet1;
     }
 
     @Override
-    public List<UserRequet> searchByRole( long role_id) {
-        Role role = roleRepository.findById(role_id).orElseThrow(() -> new Dup("Not found role ID = " + role_id));
-        List<User> searchList = userRepository.findByRoles(role);
+    public List<UserRequet> searchByRole( long role_id, Integer page) {
+        if(page == null){
+            page = 1;
+        }
+        Integer offset = Contants.PAGE_SIZE * (page - 1);
+        Role role = roleRepository.findById(role_id).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + role_id));
+        List<User> searchList = userRepository.findByRoles(role, Contants.PAGE_SIZE, offset);
         List<UserRequet> userRequets = new ArrayList<>();
         for (User user:searchList){
             userRequets.add(userConvert.convertToUserRequest(user));
@@ -102,14 +130,46 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserRequet> searchByTesxt(String text) {
+    public int countByRole(long role_id) {
+        Role role = roleRepository.findById(role_id).orElseThrow(()
+                -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + role_id));
+        List<User> searchList = userRepository.findByRoles(role);
+        if(searchList == null){
+            return 0;
+        }
+        return searchList.size();
+    }
+
+    @Override
+    public List<UserRequet> searchByTesxt(String text, Integer page) {
+        if(page == null){
+            page = 1;
+        }
+        Integer offset = Contants.PAGE_SIZE * (page - 1);
         List<User> searchList = userRepository.findByUsernameContaining(text);
         List<UserRequet> userRequets = new ArrayList<>();
         for (User user:searchList){
             userRequets.add(userConvert.convertToUserRequest(user));
         }
         return userRequets;
+    }
 
+    @Override
+    public int countByTesxt(String text) {
+        List<User> searchList = userRepository.findByUsernameContaining(text);
+        if(searchList == null){
+            return 0;
+        }
+        return searchList.size();
+    }
+
+    @Override
+    public List<UserRequet> getAllUserByPage(Integer page) {
+        if(page == null){
+            page = 1;
+        }
+        Integer offset = Contants.PAGE_SIZE * (page - 1);
+        return userRepository.getAllUserByPage(Contants.PAGE_SIZE, offset);
     }
 
 

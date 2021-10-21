@@ -20,8 +20,8 @@ public class ControllerExceptionHandler {
 
         return new ResponseEntity<ErrorMessage>(message, HttpStatus.NOT_FOUND);
     }
-    @ExceptionHandler(Dup.class)
-    public ResponseEntity<Message> resourceNotFoundException(Dup ex, WebRequest request) {
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<Message> resourceNotFoundException(AppException ex, WebRequest request) {
         Message message = new Message(
                 new Date(),
                 ex.getMessage());
