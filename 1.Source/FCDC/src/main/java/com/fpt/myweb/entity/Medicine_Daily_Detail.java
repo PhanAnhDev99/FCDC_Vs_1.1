@@ -18,6 +18,7 @@ public class Medicine_Daily_Detail extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "medicine_id")
     private Medicine medicine;
+
     @ManyToOne
     @JoinColumn(name = "daily_report_id")
     private Daily_Report daily_report;

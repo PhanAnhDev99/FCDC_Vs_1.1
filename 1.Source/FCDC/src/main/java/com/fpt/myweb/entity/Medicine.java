@@ -17,8 +17,10 @@ import java.util.List;
 @Getter
 @Setter
 public class Medicine extends BaseEntity{
+
     @JoinColumn(name = "name")
     private String name;
+
     @JoinColumn(name = "description")
     private String description;
 

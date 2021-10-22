@@ -172,5 +172,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.getAllUserByPage(Contants.PAGE_SIZE, offset);
     }
 
+    @Override
+    public User login(String username, String password) {
+        return userRepository.findByUsernameAndPassword(username, passwordEncoder.encode(password));
+    }
+
 
 }

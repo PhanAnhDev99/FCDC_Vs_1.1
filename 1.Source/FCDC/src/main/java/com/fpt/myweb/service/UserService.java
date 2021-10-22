@@ -26,6 +26,6 @@ public interface UserService {
 
     public List<UserRequet> getAllUserByPage(Integer page);
 
-
+    public User login(String username, String password);
 
 }

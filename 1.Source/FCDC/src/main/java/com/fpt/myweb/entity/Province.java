@@ -1,5 +1,6 @@
 package com.fpt.myweb.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.util.List;
 @Setter
 public class Province extends BaseEntity{
 
+    @JsonProperty
     @Column(name = "name")
     private String name;
 

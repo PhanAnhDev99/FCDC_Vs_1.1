@@ -6,6 +6,7 @@ import com.fpt.myweb.dto.response.LoginResponse;
 import com.fpt.myweb.entity.User;
 import com.fpt.myweb.exception.ErrorCode;
 import com.fpt.myweb.repository.UserRepository;
+import com.fpt.myweb.service.UserService;
 import org.hibernate.annotations.MetaValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,14 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api")
 public class LoginController {
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @PostMapping(value = "/login", consumes = {MediaType.ALL_VALUE})
     public ResponseEntity<CommonRes> checkLogin(LoginRequest loginRequest) {
         CommonRes commonRes = new CommonRes();
         commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
         commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-        User user = userRepository.findByUsernameAndPassword(loginRequest.getUsername(),loginRequest.getPassword());
+        User user = userService.login(loginRequest.getUsername(),loginRequest.getPassword());
         if(user==null){
             commonRes.setResponseCode(ErrorCode.AUTHENTICATION_FAILED.getKey());
             commonRes.setMessage(ErrorCode.AUTHENTICATION_FAILED.getValue());

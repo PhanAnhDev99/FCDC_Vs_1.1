@@ -61,6 +61,4 @@ public class ReportController {
         return ResponseEntity.ok(daily_report);
 
     }
-
-
 }

@@ -1,6 +1,8 @@
 package com.fpt.myweb.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 
@@ -12,16 +14,20 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class New extends BaseEntity{
+    @JsonProperty
     @Column(name = "title")
     private String title;
 
+    @JsonProperty
     @Column(name = "decription")
     private String decription;
 
-    @Column(name = "image")
-    private String image;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JsonProperty
+    @Column(name = "imageUrl")
+    private String imageUrl;
+
+    @JsonProperty
+    @Column(name = "isActive", columnDefinition = "boolean default false")
+    private boolean isActive;
 
 }
