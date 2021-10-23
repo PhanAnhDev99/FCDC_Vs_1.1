@@ -1,20 +1,26 @@
 package com.fpt.myweb.controller;
 
-import com.fpt.myweb.common.Contants;
+import com.fpt.myweb.convert.UserConvert;
 import com.fpt.myweb.dto.request.UserRequet;
 import com.fpt.myweb.dto.response.CommonRes;
 import com.fpt.myweb.dto.response.UserRes;
+import com.fpt.myweb.entity.User;
 import com.fpt.myweb.exception.AppException;
 import com.fpt.myweb.exception.ErrorCode;
 import com.fpt.myweb.service.UserService;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -27,16 +33,25 @@ public class UserController {
     ObjectFactory<HttpSession> httpSessionFactory;
 
     // get all
-    @GetMapping("/all/{page}")// fomat sang DTO trả về dữ liệu
-    public ResponseEntity<CommonRes> getAll(@PathVariable("page") Integer page) {
+    @GetMapping("/all")// fomat sang DTO trả về dữ liệu
+    public ResponseEntity<CommonRes> getAll(@PathParam("page") Integer page) {
         CommonRes commonRes = new CommonRes();
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
             commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-            List<UserRequet> userRequets = userService.getAllUserByPage(page);
+            Page<User> userPage = userService.getAllUserByPage(page);
+            List<User> users = new ArrayList<User>();
+            List<UserRequet> userRequets = new ArrayList<>();
+            users = userPage.getContent();
+
+            if (!users.isEmpty()) {
+                for (User user: users){
+                    userRequets.add(UserConvert.convertToUserRequest(user));
+                }
+            }
             UserRes userRes = new UserRes();
             userRes.setUserRequets(userRequets);
-            userRes.setTotal(userService.getAllUser().size());
+            userRes.setTotal(userPage.getTotalElements());
             commonRes.setData(userRes);
         } catch (Exception e){
             commonRes.setResponseCode(ErrorCode.INTERNAL_SERVER_ERROR.getKey());
@@ -46,8 +61,8 @@ public class UserController {
     }
 
     // get usser by role
-    @GetMapping("/searchByRole/{role_id}/{page}")// fomat sang DTO trả về dữ liệu
-    public ResponseEntity<CommonRes> getAllByRole(@PathVariable("role_id") Long id, @PathVariable("page") Integer page) {
+    @GetMapping("/searchByRole")// fomat sang DTO trả về dữ liệu
+    public ResponseEntity<CommonRes> getAllByRole(@PathParam("role_id") Long id, @PathParam("page") Integer page) {
         CommonRes commonRes = new CommonRes();
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
@@ -65,16 +80,16 @@ public class UserController {
     }
 
     // get usser by text in Username
-    @GetMapping("/searchText/{text}/{page}")// fomat sang DTO trả về dữ liệu
-    public ResponseEntity<CommonRes> getAllByText(@PathVariable("text") String text, @PathVariable("page") Integer page) {
+    @GetMapping("/searchText")// fomat sang DTO trả về dữ liệu
+    public ResponseEntity<CommonRes> getAllByText(@PathParam("key") String key, @PathParam("page") Integer page) {
         CommonRes commonRes = new CommonRes();
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
             commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-            List<UserRequet> userRequets = userService.searchByTesxt(text, page);
+            List<UserRequet> userRequets = userService.searchByTesxt(key, page);
             UserRes userRes = new UserRes();
             userRes.setUserRequets(userRequets);
-            userRes.setTotal(userService.countByTesxt(text));
+            userRes.setTotal(userService.countByTesxt(key));
             commonRes.setData(userRes);
         } catch (Exception e){
             commonRes.setResponseCode(ErrorCode.INTERNAL_SERVER_ERROR.getKey());
@@ -120,8 +135,8 @@ public class UserController {
     }
 
     // Delete
-    @DeleteMapping(value = "delete/{id}")
-    public ResponseEntity<CommonRes> remove(@PathVariable("id") long id) {
+    @DeleteMapping(value = "delete")
+    public ResponseEntity<CommonRes> remove(@PathParam("id") long id) {
         CommonRes commonRes = new CommonRes();
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());

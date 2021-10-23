@@ -55,7 +55,6 @@ public class User extends BaseEntity {
     private Date birthOfdate;
 
 
-
     // Role
     @ManyToOne
     @JoinColumn(name = "role_id")

@@ -37,7 +37,7 @@ public class UserRequet {
 
     private String imageUrl;
 
-    private Date birthOfdate;
+    private String birthOfdate;
 
     private long role_id;
 

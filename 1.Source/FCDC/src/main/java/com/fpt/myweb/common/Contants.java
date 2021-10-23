@@ -8,4 +8,6 @@ public class Contants {
     public final static String TYPE_NEW = "new";
 
     public final static String USER_SESSION = "USER_SESSION";
+
+    public final static String DATE_FORMAT = "dd/MM/yyyy";
 }

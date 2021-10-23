@@ -21,9 +21,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 @Service
@@ -57,7 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User addUser(UserRequet userRequet) {
+    public User addUser(UserRequet userRequet) throws ParseException {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         Role role = roleRepository.findById(userRequet.getRole_id()).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + userRequet.getRole_id()));
@@ -70,7 +74,8 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(userRequet.getPassword()));
         user.setAddress(userRequet.getAddress());
         user.setEmail(userRequet.getEmail());
-//        user.setBirthOfdate(userRequet.getBirthOfdate());
+        Date date = new SimpleDateFormat(Contants.DATE_FORMAT).parse(userRequet.getBirthOfdate());
+        user.setBirthOfdate(date);
         user.setFirstname(userRequet.getFirstname());
         user.setLastname(userRequet.getLastname());
         user.setPhone(userRequet.getPhone());
@@ -90,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserRequet edit(UserRequet userRequet) {
+    public UserRequet edit(UserRequet userRequet) throws ParseException {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         User user = userRepository.findById(userRequet.getId()).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_ID.getKey(), ErrorCode.NOT_FOUND_ID.getValue() + userRequet.getId()));
@@ -104,7 +109,8 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(userRequet.getPassword()));
         user.setAddress(userRequet.getAddress());
         user.setEmail(userRequet.getEmail());
-//        user.setBirthOfdate(userRequet.getBirthOfdate());
+        Date date = new SimpleDateFormat(Contants.DATE_FORMAT).parse(userRequet.getBirthOfdate());
+        user.setBirthOfdate(date);
         user.setFirstname(userRequet.getFirstname());
         user.setLastname(userRequet.getLastname());
         user.setPhone(userRequet.getPhone());
@@ -147,8 +153,8 @@ public class UserServiceImpl implements UserService {
         if(page == null){
             page = 1;
         }
-        Integer offset = Contants.PAGE_SIZE * (page - 1);
-        List<User> searchList = userRepository.findByUsernameContaining(text);
+        Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
+        List<User> searchList = userRepository.findByUsernameContaining(text, pageable);
         List<UserRequet> userRequets = new ArrayList<>();
         for (User user:searchList){
             userRequets.add(userConvert.convertToUserRequest(user));
@@ -166,20 +172,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserRequet> getAllUserByPage(Integer page) {
+    public Page<User> getAllUserByPage(Integer page) {
         List<UserRequet> userRequets = new ArrayList<>();
         if(page == null){
-            page = 1;
+            page = 0;
         }
         Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
-        Page<User> users = userRepository.findAll(pageable);
-        UserConvert userConvert = new UserConvert();
-        UserRequet userRequet = null;
-        for (User user: users){
-            userRequet = userConvert.convertToUserRequest(user);
-            userRequets.add(userRequet);
-        }
-        return userRequets;
+        Page<User> searchList = userRepository.findAll(pageable);
+        return searchList;
     }
 
     @Override

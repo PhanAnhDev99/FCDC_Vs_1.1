@@ -2,7 +2,9 @@ package com.fpt.myweb.service;
 
 import com.fpt.myweb.dto.request.UserRequet;
 import com.fpt.myweb.entity.User;
+import org.springframework.data.domain.Page;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface UserService {
@@ -11,10 +13,10 @@ public interface UserService {
     //get by id
     public UserRequet getUser(long id);
     //create new User
-    public User addUser(UserRequet userRequet);
+    public User addUser(UserRequet userRequet) throws ParseException;
     //Delete User
     public UserRequet deleteUser(long id);
-    public UserRequet edit(UserRequet userRequet);
+    public UserRequet edit(UserRequet userRequet) throws ParseException;
     // search
     public List<UserRequet> searchByRole(long role_id, Integer page);
 
@@ -24,7 +26,7 @@ public interface UserService {
 
     public int countByTesxt(String text);
 
-    public List<UserRequet> getAllUserByPage(Integer page);
+    public Page<User> getAllUserByPage(Integer page);
 
     public User login(String username, String password);
 
