@@ -3,7 +3,9 @@ package com.fpt.myweb.service.impl;
 
 import com.fpt.myweb.common.Contants;
 import com.fpt.myweb.service.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -18,28 +20,22 @@ import java.util.Base64;
 @Service
 public class FileServiceImpl implements FileService {
 
-    @Value("${folder.user.images}")
-    private String userImage;
-
-    @Value("${folder.user.news}")
-    private String userNew;
+    @Autowired
+    private Environment env;
 
     @Override
     public String saveFile(MultipartFile file, String type) throws IOException {
         String result = "";
         File fileUpload = null;
         if(type.equalsIgnoreCase(Contants.TYPE_USER)){
-            fileUpload = new File(userImage);
-            if(!fileUpload.exists()){
-                fileUpload.mkdir();
-            }
-            result = userImage;
+            result = env.getProperty("folder.user.images");
+
         } else if(type.equalsIgnoreCase(Contants.TYPE_NEW)){
-            fileUpload = new File(userNew);
-            if(!fileUpload.exists()){
-                fileUpload.mkdir();
-            }
-            result = userNew;
+            result = env.getProperty("folder.user.images");
+        }
+        fileUpload = new File(result);
+        if(!fileUpload.exists()){
+            fileUpload.mkdir();
         }
         if(fileUpload != null){
             InputStream inputStream = null;

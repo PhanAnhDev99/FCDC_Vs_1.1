@@ -1,23 +1,30 @@
 package com.fpt.myweb.controller;
 
+import com.fpt.myweb.common.Contants;
 import com.fpt.myweb.dto.request.UserRequet;
 import com.fpt.myweb.dto.response.CommonRes;
 import com.fpt.myweb.dto.response.UserRes;
 import com.fpt.myweb.exception.AppException;
 import com.fpt.myweb.exception.ErrorCode;
 import com.fpt.myweb.service.UserService;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 
 @RestController
+@RequestMapping(value = "/user")
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    ObjectFactory<HttpSession> httpSessionFactory;
 
     // get all
     @GetMapping("/all/{page}")// fomat sang DTO trả về dữ liệu
@@ -81,9 +88,15 @@ public class UserController {
     public ResponseEntity<CommonRes> addUsers(UserRequet userRequet) {
         CommonRes commonRes = new CommonRes();
         try {
-            commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
-            commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-            userService.addUser(userRequet);
+            HttpSession session = httpSessionFactory.getObject();
+            if(session.getAttribute(Contants.USER_SESSION) == null){
+                commonRes.setResponseCode(ErrorCode.AUTHENTICATION_FAILED.getKey());
+                commonRes.setMessage(ErrorCode.AUTHENTICATION_FAILED.getValue());
+            }else{
+                commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
+                commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
+                userService.addUser(userRequet);
+            }
         } catch (AppException a){
             commonRes.setResponseCode(a.getErrorCode());
             commonRes.setMessage(a.getErrorMessage());

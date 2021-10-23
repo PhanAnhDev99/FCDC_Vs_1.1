@@ -6,4 +6,6 @@ public class Contants {
     public final static String TYPE_USER = "user";
 
     public final static String TYPE_NEW = "new";
+
+    public final static String USER_SESSION = "USER_SESSION";
 }

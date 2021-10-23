@@ -38,28 +38,28 @@ public class MasterDataServiceImpl implements MasterDataService {
     @Override
     public List<Village> pickerVillage(String key, Integer districtId) {
         District district = districtRepository.getById((long) districtId);
-        return villageRepository.pickerVillage(key, district);
+        return villageRepository.findTop20ByNameContainingAndDistrictOrderById(key, district);
     }
 
     @Override
     public List<District> pickerDistrict(String key, Integer provinceId) {
         Province province = provinceRepository.getById((long) provinceId);
-        return districtRepository.pickerDistrict(key, province);
+        return districtRepository.findTop20ByNameContainingAndProvinceOrderById(key, province);
     }
 
     @Override
     public List<Province> pickerProvince(String key) {
-        return provinceRepository.pickerProvince(key);
+        return provinceRepository.findTop20ByNameContainingOrderById(key);
     }
 
     @Override
     public List<Medical_Clinic> pickerMedical_Clinic(String key, Integer villageId) {
         Village village = villageRepository.getById((long) villageId);
-        return medicalClinicRepository.pickerMedical_Clinic(key, village);
+        return medicalClinicRepository.findTop20ByNameContainingAndVillageOrderById(key, village);
     }
 
     @Override
     public List<Medicine> pickerMedicine(String key) {
-        return medicineRepository.pickerMedicine(key);
+        return medicineRepository.findTop20ByNameContainingOrderById(key);
     }
 }

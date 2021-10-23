@@ -59,7 +59,7 @@ public class User extends BaseEntity {
     // Role
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private Role roles; // chỗ ni trung với mapby bên User
+    private Role role; // chỗ ni trung với mapby bên User
     // Dia chi (village)
     @ManyToOne
     @JoinColumn(name = "village_id")

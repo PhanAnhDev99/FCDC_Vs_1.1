@@ -29,7 +29,7 @@ public class UserConvert {
         userRequet.setPhone(user.getPhone());
         userRequet.setAddress(user.getAddress());
         userRequet.setBirthOfdate(user.getBirthOfdate());
-        userRequet.setRole_id(user.getRoles().getId());
+        userRequet.setRole_id(user.getRole().getId());
         userRequet.setVillage_id(user.getVillage().getId());
         return userRequet;
     }

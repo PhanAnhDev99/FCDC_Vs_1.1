@@ -1,8 +1,6 @@
 package com.fpt.myweb.service.impl;
 
 
-
-
 import com.fpt.myweb.common.Contants;
 import com.fpt.myweb.convert.UserConvert;
 import com.fpt.myweb.dto.request.UserRequet;
@@ -16,6 +14,10 @@ import com.fpt.myweb.repository.UserRepository;
 import com.fpt.myweb.repository.VillageRepository;
 import com.fpt.myweb.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +37,6 @@ public class UserServiceImpl implements UserService {
     private VillageRepository villageRepository;
     @Autowired
     private UserConvert userConvert;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserRequet> getAllUser() {
@@ -59,18 +58,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addUser(UserRequet userRequet) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         Role role = roleRepository.findById(userRequet.getRole_id()).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + userRequet.getRole_id()));
         Village village = villageRepository.findById(userRequet.getVillage_id()).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_VILLAGE_ID.getKey(), ErrorCode.NOT_FOUND_VILLAGE_ID.getValue() + userRequet.getVillage_id()));
         User user = userConvert.convertToUser(userRequet);
-        user.setRoles(role);
+        user.setRole(role);
         user.setVillage(village);
         user.setUsername(userRequet.getUsername());
         user.setPassword(passwordEncoder.encode(userRequet.getPassword()));
         user.setAddress(userRequet.getAddress());
         user.setEmail(userRequet.getEmail());
-        user.setBirthOfdate(userRequet.getBirthOfdate());
+//        user.setBirthOfdate(userRequet.getBirthOfdate());
         user.setFirstname(userRequet.getFirstname());
         user.setLastname(userRequet.getLastname());
         user.setPhone(userRequet.getPhone());
@@ -91,19 +91,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserRequet edit(UserRequet userRequet) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         User user = userRepository.findById(userRequet.getId()).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_ID.getKey(), ErrorCode.NOT_FOUND_ID.getValue() + userRequet.getId()));
         Role role = roleRepository.findById(userRequet.getRole_id()).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + userRequet.getRole_id()));
         Village village = villageRepository.findById(userRequet.getVillage_id()).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_VILLAGE_ID.getKey(), ErrorCode.NOT_FOUND_VILLAGE_ID.getValue() + userRequet.getVillage_id()));
-        user.setRoles(role);
+        user.setRole(role);
         user.setVillage(village);
         user.setUsername(userRequet.getUsername());
         user.setPassword(passwordEncoder.encode(userRequet.getPassword()));
         user.setAddress(userRequet.getAddress());
         user.setEmail(userRequet.getEmail());
-        user.setBirthOfdate(userRequet.getBirthOfdate());
+//        user.setBirthOfdate(userRequet.getBirthOfdate());
         user.setFirstname(userRequet.getFirstname());
         user.setLastname(userRequet.getLastname());
         user.setPhone(userRequet.getPhone());
@@ -121,7 +122,8 @@ public class UserServiceImpl implements UserService {
         Integer offset = Contants.PAGE_SIZE * (page - 1);
         Role role = roleRepository.findById(role_id).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + role_id));
-        List<User> searchList = userRepository.findByRoles(role, Contants.PAGE_SIZE, offset);
+        Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
+        List<User> searchList = userRepository.findAllUserByRole(role, pageable);
         List<UserRequet> userRequets = new ArrayList<>();
         for (User user:searchList){
             userRequets.add(userConvert.convertToUserRequest(user));
@@ -133,7 +135,7 @@ public class UserServiceImpl implements UserService {
     public int countByRole(long role_id) {
         Role role = roleRepository.findById(role_id).orElseThrow(()
                 -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + role_id));
-        List<User> searchList = userRepository.findByRoles(role);
+        List<User> searchList = userRepository.findByRole(role);
         if(searchList == null){
             return 0;
         }
@@ -165,16 +167,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserRequet> getAllUserByPage(Integer page) {
+        List<UserRequet> userRequets = new ArrayList<>();
         if(page == null){
             page = 1;
         }
-        Integer offset = Contants.PAGE_SIZE * (page - 1);
-        return userRepository.getAllUserByPage(Contants.PAGE_SIZE, offset);
+        Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
+        Page<User> users = userRepository.findAll(pageable);
+        UserConvert userConvert = new UserConvert();
+        UserRequet userRequet = null;
+        for (User user: users){
+            userRequet = userConvert.convertToUserRequest(user);
+            userRequets.add(userRequet);
+        }
+        return userRequets;
     }
 
     @Override
     public User login(String username, String password) {
-        return userRepository.findByUsernameAndPassword(username, passwordEncoder.encode(password));
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User user = userRepository.findByUsername(username);
+        if (passwordEncoder.matches(password, user.getPassword())){
+            return user;
+        }
+        return null;
     }
 
 

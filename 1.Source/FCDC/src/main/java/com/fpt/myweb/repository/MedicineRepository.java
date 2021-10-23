@@ -12,6 +12,5 @@ import java.util.List;
 @Repository
 public interface MedicineRepository extends JpaRepository<Medicine,Long> {
 
-    @Query("Select c from Medicine c where c.name like %:key% limit 20")
-    List<Medicine> pickerMedicine(String key);
+    List<Medicine> findTop20ByNameContainingOrderById(String name);
 }

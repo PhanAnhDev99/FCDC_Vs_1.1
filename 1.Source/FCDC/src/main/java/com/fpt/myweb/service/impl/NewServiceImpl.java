@@ -9,6 +9,8 @@ import com.fpt.myweb.exception.ErrorCode;
 import com.fpt.myweb.repository.NewRepository;
 import com.fpt.myweb.service.NewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -66,7 +68,8 @@ public class NewServiceImpl implements NewService {
         if(page == null){
             page = 1;
         }
-        Integer offset = Contants.PAGE_SIZE * (page - 1);
-        return newRepository.getNew(Contants.PAGE_SIZE, offset);
+        Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
+
+        return newRepository.findAllNewsWithPagination(pageable);
     }
 }

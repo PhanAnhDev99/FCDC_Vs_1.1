@@ -22,7 +22,7 @@ public class Role extends BaseEntity{
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "roles") // chỗ ni tên gióng với tên chỗ khởi tạo role
+    @OneToMany(mappedBy = "role") // chỗ ni tên gióng với tên chỗ khởi tạo role
     private List<User> users = new ArrayList<>();
 
 

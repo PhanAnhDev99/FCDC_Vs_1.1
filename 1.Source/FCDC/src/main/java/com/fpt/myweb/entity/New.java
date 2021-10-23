@@ -30,4 +30,8 @@ public class New extends BaseEntity{
     @Column(name = "isActive", columnDefinition = "boolean default false")
     private boolean isActive;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }
