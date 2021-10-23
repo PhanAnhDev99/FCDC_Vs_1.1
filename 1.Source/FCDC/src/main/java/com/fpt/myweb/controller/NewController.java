@@ -26,8 +26,8 @@ public class NewController {
     @Autowired
     private NewService newService;
 
-    @GetMapping("/get/{page}")
-    public ResponseEntity<CommonRes> getNew(@PathVariable("page") Integer page) {
+    @GetMapping("/get")
+    public ResponseEntity<CommonRes> getNew(@PathParam("page") Integer page) {
         CommonRes commonRes = new CommonRes();
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
@@ -59,7 +59,7 @@ public class NewController {
         return ResponseEntity.ok(commonRes);
     }
 
-    @PostMapping("/edit")
+    @PutMapping("/edit")
     public ResponseEntity<CommonRes> editNew(NewRequet newRequet) {
         CommonRes commonRes = new CommonRes();
         try {
@@ -77,7 +77,7 @@ public class NewController {
         return ResponseEntity.ok(commonRes);
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<CommonRes> deleteNew(@PathParam("id") Integer id) {
         CommonRes commonRes = new CommonRes();
         try {
