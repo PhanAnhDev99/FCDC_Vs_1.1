@@ -62,15 +62,15 @@ public class UserController {
 
     // get usser by role
     @GetMapping("/searchByRole")// fomat sang DTO trả về dữ liệu
-    public ResponseEntity<CommonRes> getAllByRole(@PathParam("role_id") Long id, @PathParam("page") Integer page) {
+    public ResponseEntity<CommonRes> getAllByRole(@PathParam("roleId") Long roleId, @PathParam("page") Integer page) {
         CommonRes commonRes = new CommonRes();
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
             commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-            List<UserRequet> userRequets = userService.searchByRole(id, page);
+            List<UserRequet> userRequets = userService.searchByRole(roleId, page);
             UserRes userRes = new UserRes();
             userRes.setUserRequets(userRequets);
-            userRes.setTotal(userService.countByRole(id));
+            userRes.setTotal(userService.countByRole(roleId));
             commonRes.setData(userRes);
         } catch (Exception e){
             commonRes.setResponseCode(ErrorCode.INTERNAL_SERVER_ERROR.getKey());

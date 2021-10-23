@@ -121,15 +121,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserRequet> searchByRole( long role_id, Integer page) {
+    public List<UserRequet> searchByRole( Long role_id, Integer page) {
         if(page == null){
-            page = 1;
+            page = 0;
         }
-        Integer offset = Contants.PAGE_SIZE * (page - 1);
-        Role role = roleRepository.findById(role_id).orElseThrow(()
-                -> new AppException(ErrorCode.NOT_FOUND_ROLE_ID.getKey(), ErrorCode.NOT_FOUND_ROLE_ID.getValue() + role_id));
         Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
-        List<User> searchList = userRepository.findAllUserByRole(role, pageable);
+        List<User> searchList = userRepository.findAllUserByRoleId(role_id, pageable);
         List<UserRequet> userRequets = new ArrayList<>();
         for (User user:searchList){
             userRequets.add(userConvert.convertToUserRequest(user));

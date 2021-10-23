@@ -18,7 +18,7 @@ public interface UserService {
     public UserRequet deleteUser(long id);
     public UserRequet edit(UserRequet userRequet) throws ParseException;
     // search
-    public List<UserRequet> searchByRole(long role_id, Integer page);
+    public List<UserRequet> searchByRole(Long role_id, Integer page);
 
     public int countByRole(long role_id);
 
