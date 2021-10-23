@@ -15,11 +15,11 @@ import javax.persistence.*;
 @Setter
 public class New extends BaseEntity{
     @JsonProperty
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "TEXT")
     private String title;
 
     @JsonProperty
-    @Column(name = "decription")
+    @Column(name = "decription", columnDefinition = "TEXT")
     private String decription;
 
     @JsonProperty

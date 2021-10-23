@@ -2,11 +2,10 @@ package com.fpt.myweb.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 @Entity
@@ -23,5 +22,8 @@ public class Medicine extends BaseEntity{
 
     @JoinColumn(name = "description")
     private String description;
+
+    @ManyToMany(mappedBy = "medicines", fetch = FetchType.LAZY)
+    Collection<Daily_Report> dailyReports = new HashSet<>();
 
 }
