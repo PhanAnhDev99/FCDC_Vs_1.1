@@ -46,7 +46,7 @@ public class LoginController {
                 loginResponse.setRole(user.getRole().getName());
                 commonRes.setData(loginResponse);
                 HttpSession session = httpSessionFactory.getObject();
-                session.setAttribute(Contants.USER_SESSION, loginResponse);
+                session.setAttribute(Contants.USER_SESSION, user);
             }
         } catch (Exception e){
             commonRes.setResponseCode(ErrorCode.INTERNAL_SERVER_ERROR.getKey());

@@ -88,15 +88,9 @@ public class UserController {
     public ResponseEntity<CommonRes> addUsers(UserRequet userRequet) {
         CommonRes commonRes = new CommonRes();
         try {
-            HttpSession session = httpSessionFactory.getObject();
-            if(session.getAttribute(Contants.USER_SESSION) == null){
-                commonRes.setResponseCode(ErrorCode.AUTHENTICATION_FAILED.getKey());
-                commonRes.setMessage(ErrorCode.AUTHENTICATION_FAILED.getValue());
-            }else{
-                commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
-                commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-                userService.addUser(userRequet);
-            }
+            commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
+            commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
+            userService.addUser(userRequet);
         } catch (AppException a){
             commonRes.setResponseCode(a.getErrorCode());
             commonRes.setMessage(a.getErrorMessage());
