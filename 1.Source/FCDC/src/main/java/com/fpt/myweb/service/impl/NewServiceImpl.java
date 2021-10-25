@@ -66,7 +66,9 @@ public class NewServiceImpl implements NewService {
     @Override
     public List<New> getNew(Integer page) {
         if(page == null){
-            page = 1;
+            page = 0;
+        }else{
+            page--;
         }
         Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
 

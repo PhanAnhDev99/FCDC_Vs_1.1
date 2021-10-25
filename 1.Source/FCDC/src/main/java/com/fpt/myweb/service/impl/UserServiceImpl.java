@@ -124,6 +124,8 @@ public class UserServiceImpl implements UserService {
     public List<UserRequet> searchByRole( Long role_id, Integer page) {
         if(page == null){
             page = 0;
+        }else{
+            page--;
         }
         Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
         List<User> searchList = userRepository.findAllUserByRoleId(role_id, pageable);
@@ -149,6 +151,8 @@ public class UserServiceImpl implements UserService {
     public List<UserRequet> searchByTesxt(String text, Integer page) {
         if(page == null){
             page = 1;
+        }else{
+            page--;
         }
         Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
         List<User> searchList = userRepository.findByUsernameContaining(text, pageable);
@@ -173,6 +177,8 @@ public class UserServiceImpl implements UserService {
         List<UserRequet> userRequets = new ArrayList<>();
         if(page == null){
             page = 0;
+        }else{
+            page--;
         }
         Pageable pageable = PageRequest.of(page, Contants.PAGE_SIZE);
         Page<User> searchList = userRepository.findAll(pageable);

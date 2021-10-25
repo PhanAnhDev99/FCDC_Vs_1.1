@@ -1,21 +1,36 @@
 package com.fpt.myweb.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
+
 @Setter
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public class Report {
+
+    private Long id;
+
     private Long userId;
+
     private String comment;
+
     private Double bodyTemperature;
+
     private Double oxygenConcentration;
-    private List<Long> listSysptomId;
-    private List<Long> listMedicineId;
-    private List<Long> listExerciseId;
+
+    private String listSysptomId;
+
+    private String listMedicineId;
+
+    private String listExerciseId;
+
+    private List<Long> listSysptom;
+
+    private List<Long> listMedicine;
+
+    private List<Long> listExercise;
+
+    private Date dateReport;
 }

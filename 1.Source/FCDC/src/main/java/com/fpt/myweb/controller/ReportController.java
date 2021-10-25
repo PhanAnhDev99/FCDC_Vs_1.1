@@ -1,67 +1,71 @@
 package com.fpt.myweb.controller;
 
+import com.fpt.myweb.convert.UserConvert;
 import com.fpt.myweb.dto.request.Report;
 import com.fpt.myweb.dto.response.CommonRes;
+import com.fpt.myweb.dto.response.DailyReportRes;
 import com.fpt.myweb.entity.*;
 import com.fpt.myweb.exception.ErrorCode;
-import com.fpt.myweb.repository.*;
+import com.fpt.myweb.service.DailyReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/report")
 public class ReportController {
     @Autowired
-    private Daily_ReportRepository daily_reportRepository;
+    private DailyReportService dailyReportService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private SysptomRepository sysptomRepository;
-
-    @Autowired
-    private MedicineRepository medicineRepository;
-
-    @Autowired
-    private ExerciseRepository exerciseRepository;
-
-    @PostMapping(value = "/addReport")
+    @PostMapping(value = "/addReport", consumes = {MediaType.ALL_VALUE})
     public ResponseEntity<CommonRes> addReport(Report report){
         CommonRes commonRes = new CommonRes();
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
             commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-            Daily_Report daily_report = new Daily_Report();
-            User user = userRepository.findById(report.getUserId()).orElse(null);
-            daily_report.setUser(user);
-            daily_report.setCreatedDate(new Date());
-            daily_report.setComment(report.getComment());
-            daily_report.setBodyTemperature(report.getBodyTemperature());
-            daily_report.setOxygenConcentration(report.getOxygenConcentration());
-            daily_report.setDateTime(new Date());
+            dailyReportService.addReport(report);
+        } catch (Exception e){
+            commonRes.setResponseCode(ErrorCode.INTERNAL_SERVER_ERROR.getKey());
+            commonRes.setMessage(ErrorCode.INTERNAL_SERVER_ERROR.getValue());
+        }
+        return ResponseEntity.ok(commonRes);
+    }
 
-            for(int i = 0; i< report.getListSysptomId().size() ;i++){
-                Sysptom sysptom = sysptomRepository.findById(report.getListSysptomId().get(i)).orElse(null);
-                daily_report.getSysptoms().add(sysptom);
+    @GetMapping(value = "/getReport", consumes = {MediaType.ALL_VALUE})
+    public ResponseEntity<CommonRes> getReport(@PathParam("page") Integer page){
+        CommonRes commonRes = new CommonRes();
+        try {
+            commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
+            commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
+            Page<Daily_Report> newList = dailyReportService.getReport(page);
+            List<Daily_Report> daily_reports = newList.getContent();
+            List<Report> reports = new ArrayList<>();
+            if (!daily_reports.isEmpty()) {
+                for (Daily_Report report: daily_reports){
+                    Report item = new Report();
+                    item.setId(report.getId());
+                    item.setUserId(report.getUser().getId());
+                    item.setComment(report.getComment());
+                    item.setBodyTemperature(report.getBodyTemperature());
+                    item.setOxygenConcentration(report.getOxygenConcentration());
+                    item.setListExercise(report.getExercises().stream().map(e->e.getId()).collect(Collectors.toList()));
+                    item.setListMedicine(report.getMedicines().stream().map(e->e.getId()).collect(Collectors.toList()));
+                    item.setListSysptom(report.getSysptoms().stream().map(e->e.getId()).collect(Collectors.toList()));
+                    item.setDateReport(report.getDateTime());
+                    reports.add(item);
+                }
             }
-            for(int i = 0; i< report.getListMedicineId().size() ;i++){
-                Medicine medicine = medicineRepository.findById(report.getListMedicineId().get(i)).orElse(null);
-                daily_report.getMedicines().add(medicine);
-            }
-            for(int i = 0; i< report.getListExerciseId().size() ;i++){
-                Exercise exercise = exerciseRepository.findById((report.getListExerciseId().get(i))).orElse(null);
-                daily_report.getExercises().add(exercise);
-
-            }
-            daily_reportRepository.save(daily_report);
-            commonRes.setData(daily_report);
+            DailyReportRes reportRes = new DailyReportRes();
+            reportRes.setTotal(newList.getTotalElements());
+            reportRes.setDailyReports(reports);
+            commonRes.setData(reportRes);
         } catch (Exception e){
             commonRes.setResponseCode(ErrorCode.INTERNAL_SERVER_ERROR.getKey());
             commonRes.setMessage(ErrorCode.INTERNAL_SERVER_ERROR.getValue());
