@@ -76,8 +76,5 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Medical_Staff> medical_staffs = new ArrayList<>();
 
-    @JsonProperty
-    @Column(name = "isDelete", columnDefinition = "boolean default false")
-    private boolean isDelete;
 
 }

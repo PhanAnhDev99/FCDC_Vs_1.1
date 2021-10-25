@@ -55,9 +55,7 @@ public class NewServiceImpl implements NewService {
     public void deleteNew(Integer id) {
         New aNew = newRepository.getById((long) id);
         if(aNew != null){
-            aNew.setDelete(false);
-            aNew.setModifiedDate(new Date());
-            newRepository.save(aNew);
+            newRepository.delete(aNew);
         }else{
             throw new AppException(ErrorCode.NOT_FOUND_ID.getKey(), ErrorCode.NOT_FOUND_ID.getValue() + id);
         }

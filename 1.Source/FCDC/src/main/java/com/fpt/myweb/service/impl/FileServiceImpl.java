@@ -31,7 +31,7 @@ public class FileServiceImpl implements FileService {
             result = env.getProperty("folder.user.images");
 
         } else if(type.equalsIgnoreCase(Contants.TYPE_NEW)){
-            result = env.getProperty("folder.user.images");
+            result = env.getProperty("folder.new.images");
         }
         fileUpload = new File(result);
         if(!fileUpload.exists()){
@@ -41,10 +41,8 @@ public class FileServiceImpl implements FileService {
             InputStream inputStream = null;
             File fileUrl = null;
             inputStream = file.getInputStream();
-            String name = file.getName();
-            String namebase64 = new String(Base64.getUrlEncoder().encode(name.getBytes())) +
-                    System.currentTimeMillis() + name.split("\\.(?=[^\\.]+$)");
-            result += namebase64;
+            String name = file.getResource().getFilename();
+            result += System.currentTimeMillis() + "_" + name;
             fileUrl = new File(result);
             OutputStream outStream = new FileOutputStream(fileUrl);
             FileCopyUtils.copy(inputStream, outStream);
