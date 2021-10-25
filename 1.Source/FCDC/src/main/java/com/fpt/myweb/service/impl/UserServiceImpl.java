@@ -186,9 +186,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(String username, String password) {
+    public User login(String phone, String password) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByPhone(phone);
         if (passwordEncoder.matches(password, user.getPassword())){
             return user;
         }

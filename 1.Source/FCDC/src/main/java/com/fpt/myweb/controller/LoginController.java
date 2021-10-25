@@ -36,7 +36,7 @@ public class LoginController {
         try {
             commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
             commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
-            User user = userService.login(loginRequest.getUsername(),loginRequest.getPassword());
+            User user = userService.login(loginRequest.getPhone(),loginRequest.getPassword());
             if(user==null){
                 commonRes.setResponseCode(ErrorCode.AUTHENTICATION_FAILED.getKey());
                 commonRes.setMessage(ErrorCode.AUTHENTICATION_FAILED.getValue());

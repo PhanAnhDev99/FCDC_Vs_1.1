@@ -28,6 +28,6 @@ public interface UserService {
 
     public Page<User> getAllUserByPage(Integer page);
 
-    public User login(String username, String password);
+    public User login(String phone, String password);
 
 }

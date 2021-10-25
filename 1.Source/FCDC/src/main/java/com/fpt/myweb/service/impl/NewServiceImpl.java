@@ -30,7 +30,7 @@ public class NewServiceImpl implements NewService {
         aNew.setDecription(newRequet.getDecription());
         aNew.setImageUrl(newRequet.getImageUrl());
         aNew.setCreatedDate(new Date());
-        aNew.setActive(true);
+        aNew.setDelete(true);
         newRepository.save(aNew);
         return aNew;
     }
@@ -43,7 +43,7 @@ public class NewServiceImpl implements NewService {
             aNew.setDecription(newRequet.getDecription());
             aNew.setImageUrl(newRequet.getImageUrl());
             aNew.setModifiedDate(new Date());
-            aNew.setActive(true);
+            aNew.setDelete(true);
             newRepository.save(aNew);
         }else{
             throw new AppException(ErrorCode.NOT_FOUND_ID.getKey(), ErrorCode.NOT_FOUND_ID.getValue() + newRequet.getId());
@@ -55,7 +55,7 @@ public class NewServiceImpl implements NewService {
     public void deleteNew(Integer id) {
         New aNew = newRepository.getById((long) id);
         if(aNew != null){
-            aNew.setActive(false);
+            aNew.setDelete(false);
             aNew.setModifiedDate(new Date());
             newRepository.save(aNew);
         }else{

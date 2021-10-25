@@ -15,11 +15,11 @@ import javax.persistence.*;
 @Setter
 public class New extends BaseEntity{
     @JsonProperty
-    @Column(name = "title", columnDefinition = "TEXT")
+    @Column(name = "title", length = 100000)
     private String title;
 
     @JsonProperty
-    @Column(name = "decription", columnDefinition = "TEXT")
+    @Column(name = "decription", length = 100000)
     private String decription;
 
     @JsonProperty
@@ -27,11 +27,11 @@ public class New extends BaseEntity{
     private String imageUrl;
 
     @JsonProperty
-    @Column(name = "isActive", columnDefinition = "boolean default false")
-    private boolean isActive;
+    @Column(name = "isDelete", columnDefinition = "boolean default false")
+    private boolean isDelete;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user ;
 
 }
