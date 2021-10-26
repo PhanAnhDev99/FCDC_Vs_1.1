@@ -54,6 +54,9 @@ public class User extends BaseEntity {
     @Column(name = "birthOfdate")
     private Date birthOfdate;
 
+    @JsonProperty
+    @Column(name = "dateStart")
+    private Date dateStart;
 
     // Role
     @ManyToOne

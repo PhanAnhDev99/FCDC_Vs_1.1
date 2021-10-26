@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface Daily_ReportRepository extends JpaRepository<Daily_Report,Long> {
+    Daily_Report findById(Integer id);
 }

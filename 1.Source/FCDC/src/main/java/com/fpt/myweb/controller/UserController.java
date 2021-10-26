@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
@@ -161,6 +163,24 @@ public class UserController {
             commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
             UserRequet userRequet = userService.getUser(id);
             commonRes.setData(userRequet);
+        } catch (AppException a){
+            commonRes.setResponseCode(a.getErrorCode());
+            commonRes.setMessage(a.getErrorMessage());
+        } catch (Exception e){
+            commonRes.setResponseCode(ErrorCode.INTERNAL_SERVER_ERROR.getKey());
+            commonRes.setMessage(ErrorCode.INTERNAL_SERVER_ERROR.getValue());
+        }
+        return ResponseEntity.ok(commonRes);
+    }
+
+    @PostMapping("/importUer")
+    public ResponseEntity<CommonRes> importUer(@RequestParam("file") MultipartFile file) {
+
+        CommonRes commonRes = new CommonRes();
+        try {
+            commonRes.setResponseCode(ErrorCode.PROCESS_SUCCESS.getKey());
+            commonRes.setMessage(ErrorCode.PROCESS_SUCCESS.getValue());
+            userService.importUser(file);
         } catch (AppException a){
             commonRes.setResponseCode(a.getErrorCode());
             commonRes.setMessage(a.getErrorMessage());

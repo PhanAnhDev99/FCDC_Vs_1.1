@@ -12,4 +12,6 @@ public interface DailyReportService {
 
     void addReport(Report report);
 
+    Daily_Report getOneReport(Integer id);
+
 }

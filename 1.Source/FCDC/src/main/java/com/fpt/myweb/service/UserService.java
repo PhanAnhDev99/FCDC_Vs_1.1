@@ -3,7 +3,9 @@ package com.fpt.myweb.service;
 import com.fpt.myweb.dto.request.UserRequet;
 import com.fpt.myweb.entity.User;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -29,5 +31,7 @@ public interface UserService {
     public Page<User> getAllUserByPage(Integer page);
 
     public User login(String phone, String password);
+
+    public void importUser(MultipartFile file) throws IOException, ParseException;
 
 }

@@ -97,4 +97,9 @@ public class DailyReportServiceImpl implements DailyReportService {
         }
         daily_reportRepository.save(daily_report);
     }
+
+    @Override
+    public Daily_Report getOneReport(Integer id) {
+        return daily_reportRepository.findById(id);
+    }
 }

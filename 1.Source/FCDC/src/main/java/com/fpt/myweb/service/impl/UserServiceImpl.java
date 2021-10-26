@@ -13,21 +13,29 @@ import com.fpt.myweb.repository.RoleRepository;
 import com.fpt.myweb.repository.UserRepository;
 import com.fpt.myweb.repository.VillageRepository;
 import com.fpt.myweb.service.UserService;
+import com.fpt.myweb.utils.GetUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 
 @Service
@@ -41,6 +49,9 @@ public class UserServiceImpl implements UserService {
     private VillageRepository villageRepository;
     @Autowired
     private UserConvert userConvert;
+
+    @Autowired
+    private Environment env;
 
     @Override
     public List<UserRequet> getAllUser() {
@@ -193,6 +204,90 @@ public class UserServiceImpl implements UserService {
             return user;
         }
         return null;
+    }
+
+    @Override
+    public void importUser(MultipartFile file) throws IOException, ParseException {
+        String path = env.getProperty("folder.user.imports");
+        File fileUpload = new File(path);
+        if(!fileUpload.exists()){
+            fileUpload.mkdir();
+        }
+        if(fileUpload != null){
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            // save file
+            InputStream inputStream = null;
+            File fileUrl = null;
+            inputStream = file.getInputStream();
+            String name = file.getResource().getFilename();
+            path += System.currentTimeMillis() + "_" + name;
+            fileUrl = new File(path);
+            OutputStream outStream = new FileOutputStream(fileUrl);
+            FileCopyUtils.copy(inputStream, outStream);
+            // import user
+            FileInputStream inputStreamImport = new FileInputStream(fileUrl);
+
+            Workbook workbook = new XSSFWorkbook(inputStreamImport);
+            Sheet firstSheet = workbook.getSheetAt(0);
+            Iterator<Row> iterator = firstSheet.iterator();
+
+            while (iterator.hasNext()) {
+                Row nextRow = iterator.next();
+                Iterator<Cell> cellIterator = nextRow.cellIterator();
+                User user = new User();
+                cellIterator.next();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    if(cell.getColumnIndex() == 0){
+                        user.setUsername(cell.getStringCellValue());
+                    } else if(cell.getColumnIndex() == 1){
+                        user.setFirstname(cell.getStringCellValue());
+                    } else if(cell.getColumnIndex() == 2){
+                        user.setLastname(cell.getStringCellValue());
+                    } else if(cell.getColumnIndex() == 3){
+                        user.setPhone(cell.getStringCellValue());
+                    } else if(cell.getColumnIndex() == 4){
+                        user.setEmail(cell.getStringCellValue());
+                    } else if(cell.getColumnIndex() == 5){
+                        String address = cell.getStringCellValue();
+                        Village village = villageRepository.findByName(address);
+                        if(village != null){
+                            user.setVillage(village);
+                        }
+                    } else if(cell.getColumnIndex() == 6){
+                        try {
+                            Date date = new SimpleDateFormat(Contants.DATE_FORMAT).parse(cell.getStringCellValue());
+                            user.setBirthOfdate(date);
+                        }catch (Exception e){
+
+                        }
+                    }
+                }
+                // check User by phone
+                User userCheck = userRepository.findByPhone(user.getPhone());
+                String pass = GetUtils.generateRandomPassword(8);
+                user.setPassword(passwordEncoder.encode(pass));
+                if(userCheck == null){
+                    user.setCreatedDate(new Date());
+                    userRepository.save(user);
+                }else{
+                    userCheck.setUsername(user.getUsername());
+                    userCheck.setLastname(user.getLastname());
+                    userCheck.setFirstname(user.getFirstname());
+                    userCheck.setEmail(user.getEmail());
+                    userCheck.setVillage(user.getVillage());
+                    userCheck.setBirthOfdate(user.getBirthOfdate());
+                    userCheck.setModifiedDate(new Date());
+                    userRepository.save(userCheck);
+                }
+                // send pass to user with phone
+                // ...
+            }
+
+            workbook.close();
+            inputStream.close();
+
+        }
     }
 
 
