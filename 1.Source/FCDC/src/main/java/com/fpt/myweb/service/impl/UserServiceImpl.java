@@ -12,13 +12,13 @@ import com.fpt.myweb.exception.ErrorCode;
 import com.fpt.myweb.repository.RoleRepository;
 import com.fpt.myweb.repository.UserRepository;
 import com.fpt.myweb.repository.VillageRepository;
+import com.fpt.myweb.service.SmsService;
 import com.fpt.myweb.service.UserService;
 import com.fpt.myweb.utils.GetUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -32,10 +32,12 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 
 @Service
@@ -45,13 +47,18 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleRepository roleRepository;
+
     @Autowired
     private VillageRepository villageRepository;
+
     @Autowired
     private UserConvert userConvert;
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private SmsService smsService;
 
     @Override
     public List<UserRequet> getAllUser() {
@@ -281,7 +288,9 @@ public class UserServiceImpl implements UserService {
                     userRepository.save(userCheck);
                 }
                 // send pass to user with phone
-                // ...
+                // test
+//                smsService.sendGetJSON("0385422617", "Hello Quảng!");
+
             }
 
             workbook.close();
