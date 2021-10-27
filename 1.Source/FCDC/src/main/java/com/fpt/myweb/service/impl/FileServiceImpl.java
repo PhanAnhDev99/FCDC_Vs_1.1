@@ -3,18 +3,16 @@ package com.fpt.myweb.service.impl;
 
 import com.fpt.myweb.common.Contants;
 import com.fpt.myweb.service.FileService;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 @Service
@@ -44,8 +42,10 @@ public class FileServiceImpl implements FileService {
             String name = file.getResource().getFilename();
             result += System.currentTimeMillis() + "_" + name;
             fileUrl = new File(result);
-            OutputStream outStream = new FileOutputStream(fileUrl);
-            FileCopyUtils.copy(inputStream, outStream);
+            FileOutputStream fos = new FileOutputStream(fileUrl);
+            byte[] bytes = IOUtils.toByteArray(inputStream);
+            fos.write(bytes);
+            fos.close();
         }
         return result;
     }
